@@ -17,7 +17,7 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _pwdController = TextEditingController();
   TextEditingController _roleController = TextEditingController();
   bool circular = false;
-  // AuthClass authClass = AuthClass();
+
 
   @override
   Widget build(BuildContext context) {

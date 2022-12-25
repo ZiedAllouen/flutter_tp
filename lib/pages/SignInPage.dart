@@ -19,7 +19,7 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _pwdController = TextEditingController();
   bool circular = false;
-  // AuthClass authClass = AuthClass();
+
 
   @override
   Widget build(BuildContext context) {
