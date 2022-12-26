@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_tp/Service/Auth_Service.dart';
-import 'package:flutter_tp/pages/AddTodo.dart';
+import 'package:flutter_tp/pages/AddDish.dart';
+import 'package:flutter_tp/pages/DishCard.dart';
 import 'package:flutter_tp/pages/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tp/pages/SignUpPage.dart';

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 class AddTodoPage extends StatefulWidget {
@@ -8,6 +9,12 @@ class AddTodoPage extends StatefulWidget {
 }
 
 class _AddTodoPageState extends State<AddTodoPage> {
+  TextEditingController _dishController =TextEditingController();
+  TextEditingController _descController =TextEditingController();
+  String Time="";
+  String Tastes="";
+  String type="";
+  String typet="";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,11 +53,11 @@ class _AddTodoPageState extends State<AddTodoPage> {
                   label("Dish Time")  ,
                   SizedBox(height: 12),  
                   Row(children: [
-                    chipData("Breakfast",0xff2664fa),
+                    time("Breakfast",0xff2664fa),
                     SizedBox(width: 7),
-                    chipData("Lunch",0xff2bc89d),
+                    time("Lunch",0xff2bc89d),
                     SizedBox(width: 7),
-                    chipData("Dinner",0xff2bc8d9),
+                    time("Dinner",0xff2bc8d9),
                     ],),
                     SizedBox(height: 30),   
                   label(" Description")  ,
@@ -60,15 +67,15 @@ class _AddTodoPageState extends State<AddTodoPage> {
                   label("Tastes ")  ,
                   SizedBox(height: 12), 
                   Wrap(children: [
-                    chipData("Sweet",0xffcf6d6e),
+                    taste("Sweet",0xffcf6d6e),
                     SizedBox(width: 7),
-                    chipData("Sour",0xffcfed5f),
+                    taste("Sour",0xffcfed5f),
                     SizedBox(width: 7),
-                    chipData("Salty",0xff9be8c9),
+                    taste("Salty",0xff9be8c9),
                     SizedBox(width: 7),
-                    chipData("Bitter",0xff2bc89d),
+                    taste("Bitter",0xff2bc89d),
                     SizedBox(width: 7),
-                    chipData("Umami",0xff8ec79d),
+                    taste("Umami",0xff8ec79d),
                     
                     ],
                     ),
@@ -84,8 +91,14 @@ class _AddTodoPageState extends State<AddTodoPage> {
   }
   
     Widget Button(){
-      return Container(
-        height: 56,
+      return InkWell(
+        onTap: () {
+          FirebaseFirestore.instance.collection("dishes").add({
+            "title": _dishController.text,"time": type,  "taste": typet,"description": _descController.text
+          });
+          Navigator.pop(context);
+        },
+   child:Container (    height: 56,
         width: MediaQuery.of(context).size.width,
        decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(20),
@@ -95,7 +108,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
   color: Colors.white,
   fontSize: 18,
   fontWeight: FontWeight.w600,
-),)),
+),))),
       );
     }
     Widget Description(){
@@ -106,6 +119,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
       borderRadius: BorderRadius.circular(15),
       ),
       child: TextFormField(
+        controller: _descController,
         style: TextStyle(color: Colors.grey,
         fontSize: 17),
         maxLines: null,
@@ -122,22 +136,53 @@ class _AddTodoPageState extends State<AddTodoPage> {
       );
     
   }
-  Widget chipData(String label, int color){
-    return Chip(
-      backgroundColor: Color(color),
+  Widget time(String label, int color){
+    return InkWell(
+      onTap: () {
+        setState(() {
+          type=label;
+        });
+      }
+      ,child:Chip(
+      backgroundColor:type==label?Colors.white: Color(color),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       label: Text(
 label,
 style: TextStyle(
-  color: Colors.white,
+  color: type==label?Colors.black: Colors.white,
   fontSize: 15,
   fontWeight: FontWeight.w600,
 ),
     ),
     labelPadding: EdgeInsets.symmetric(horizontal: 17,vertical: 3.8,
     ),
-    );
+    ))
+    ;
   }
+
+    Widget taste(String label, int color){
+    return InkWell(
+      onTap: () {
+        setState(() {
+          typet=label;
+        });
+      },
+      child:Chip(
+       backgroundColor:typet==label?Colors.white: Color(color),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      label: Text(
+label,
+style: TextStyle(
+  color: typet==label?Colors.black:Colors.white,
+  fontSize: 15,
+  fontWeight: FontWeight.w600,
+),
+    ),
+    labelPadding: EdgeInsets.symmetric(horizontal: 17,vertical: 3.8,
+    ),
+    ));
+  }
+
   Widget tittle(){
     return Container(
       height: 55,
@@ -146,6 +191,7 @@ style: TextStyle(
       borderRadius: BorderRadius.circular(15),
       ),
       child: TextFormField(
+        controller: _dishController,
         style: TextStyle(color: Colors.grey,
         fontSize: 17),
         decoration: InputDecoration(border: InputBorder.none 
