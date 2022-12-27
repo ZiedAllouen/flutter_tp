@@ -2,20 +2,33 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tp/pages/HomePage.dart';
-class AddTodoPage extends StatefulWidget {
-  const AddTodoPage({Key? key}) : super(key: key);
-
+class ViewDataPage extends StatefulWidget {
+  const ViewDataPage({Key? key, required this.document,required this.id}) : super(key: key);
+final Map<String,dynamic> document;
+final String id;
   @override
-  State<AddTodoPage> createState() => _AddTodoPageState();
+  State<ViewDataPage> createState() => _ViewDataState();
 }
 
-class _AddTodoPageState extends State<AddTodoPage> {
-  TextEditingController _dishController =TextEditingController();
-  TextEditingController _descController =TextEditingController();
+class _ViewDataState extends State<ViewDataPage> {
+ late TextEditingController _dishController;
+  late TextEditingController _descController ;
   String Time="";
   String Tastes="";
   String type="";
   String typet="";
+  bool edit= false ;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    String title=widget.document["title"]==null?"No title" :widget.document["title"];
+    _dishController=TextEditingController(text:title);
+    _descController=TextEditingController(text:widget.document["description"]);
+    type=widget.document["time"];
+    typet=widget.document["taste"];
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,20 +46,46 @@ class _AddTodoPageState extends State<AddTodoPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
             SizedBox(height: 30,),
-            IconButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (builder)=>HomePage()));
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [IconButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (builder)=>HomePage()));
       }, icon:Icon(
               CupertinoIcons.arrow_left,
               color:Colors.white,
               size:28,)
               ),
+            Row  (children:[
+              IconButton(onPressed: (){
+              
+                 
+                 FirebaseFirestore.instance.collection("dishes").doc(widget.id).delete().then((value) => {
+                  Navigator.pop(context)
+                 });
+               
+      }, 
+      icon:Icon(
+              Icons.delete,
+              color:Colors.red,
+              size:28,)
+              ),
+                IconButton(onPressed: (){
+                setState(() {
+                  edit=!edit;
+                });
+      }, icon:Icon(
+              Icons.edit,
+              color:edit?Colors.green:Colors.white,
+              size:28,)
+              )])
+              ]),
               Padding(
                 padding:const EdgeInsets.symmetric(horizontal: 25,vertical: 5),
                 child:Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Create",style: TextStyle(fontSize: 33,color: Colors.white,fontWeight: FontWeight.bold,letterSpacing: 4),),
+                  Text(edit?"Editing":"View",style: TextStyle(fontSize: 33,color: Colors.white,fontWeight: FontWeight.bold,letterSpacing: 4),),
                   SizedBox(height: 8,),
-                  Text("New Dish",style: TextStyle(fontSize: 33,color: Colors.white,fontWeight: FontWeight.bold,letterSpacing: 4),),
+                  Text("Your Dish",style: TextStyle(fontSize: 33,color: Colors.white,fontWeight: FontWeight.bold,letterSpacing: 4),),
                   SizedBox(height: 25), 
                   label("Dish Name")  ,
                   SizedBox(height: 12),
@@ -82,7 +121,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                     ],
                     ),
                     SizedBox(height: 50),
-                    Button(),
+                   edit? Button():Container(),
                     SizedBox(height: 30),
         ],
               ))
@@ -95,7 +134,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
     Widget Button(){
       return InkWell(
         onTap: () {
-          FirebaseFirestore.instance.collection("dishes").add({
+          FirebaseFirestore.instance.collection("dishes").doc(widget.id).update({
             "title": _dishController.text,"time": type,  "taste": typet,"description": _descController.text
           });
           Navigator.pop(context);
@@ -106,7 +145,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
       borderRadius: BorderRadius.circular(20),
       gradient: LinearGradient(colors: [Color(0xff8a32f1),Color(0xffad32f9)])
       ),
-      child: Center(child: Text("Add New Dish",style: TextStyle(
+      child: Center(child: 
+      Text("Update Dish",style: TextStyle(
   color: Colors.white,
   fontSize: 18,
   fontWeight: FontWeight.w600,
@@ -122,6 +162,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
       ),
       child: TextFormField(
         controller: _descController,
+        enabled: edit,
         style: TextStyle(color: Colors.grey,
         fontSize: 17),
         maxLines: null,
@@ -140,11 +181,11 @@ class _AddTodoPageState extends State<AddTodoPage> {
   }
   Widget time(String label, int color){
     return InkWell(
-      onTap: () {
+      onTap: edit?() {
         setState(() {
           type=label;
         });
-      }
+      }:null
       ,child:Chip(
       backgroundColor:type==label?Colors.white: Color(color),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -164,11 +205,11 @@ style: TextStyle(
 
     Widget taste(String label, int color){
     return InkWell(
-      onTap: () {
+      onTap: edit?() {
         setState(() {
           typet=label;
         });
-      },
+      }:null,
       child:Chip(
        backgroundColor:typet==label?Colors.white: Color(color),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -194,6 +235,7 @@ style: TextStyle(
       ),
       child: TextFormField(
         controller: _dishController,
+        enabled: edit,
         style: TextStyle(color: Colors.grey,
         fontSize: 17),
         decoration: InputDecoration(border: InputBorder.none 

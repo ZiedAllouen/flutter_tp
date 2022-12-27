@@ -7,6 +7,8 @@ import 'package:flutter_tp/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tp/pages/AddDish.dart';
 import 'package:flutter_tp/pages/DishCard.dart';
+import 'package:flutter_tp/pages/SignInPage.dart';
+import 'package:flutter_tp/pages/View_data.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key?key}) : super(key: key);
@@ -53,11 +55,24 @@ label: 'Home',
 label: 'Add',
   ),
   
-  BottomNavigationBarItem(icon: Icon(Icons.logout,
+    BottomNavigationBarItem(
+      icon:InkWell(
+        onTap: ()async {
+                await authClass.signOut();
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (builder) => SignInPage()),
+                    (route) => false);
+              },
+        child:Container(height: 52,
+    width: 52,
+     child: Icon(Icons.logout,
   size: 32,color: Colors.white,
-  )
-  , label: 'Logout',
-  )
+  ),)
+      ),
+label: 'Logout',
+  ),
+
 ]),
 body:StreamBuilder<dynamic>(
   stream:_stream,
@@ -85,13 +100,21 @@ body:StreamBuilder<dynamic>(
           default:iconData=Icons.food_bank;
           iconColor=Colors.lightBlue;
         }
-       return DishCard(
+       return InkWell(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute
+          (builder: (builder)=>ViewDataPage(document: document,
+          id:snapshot.data.docs[index].id,),
+          ));
+        },
+        child:DishCard(
         title: document['title'] ==null ? "hey":document["title"], 
        iconData: iconData, 
        iconColor: iconColor, 
        time: document['time'] ==null ? "anytime":document["time"], 
-       iconBgColor: Colors.white);
-     });
+       iconBgColor: Colors.white)) ;
+     }
+     );
   })
     );
   }
